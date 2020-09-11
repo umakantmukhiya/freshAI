@@ -19,7 +19,6 @@ public class SplashScreen extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
         splashscreen = findViewById(R.id.ivSplashScreen);
 
-        Snackbar.make(splashscreen,"Loading..." , Snackbar.LENGTH_SHORT).show();
         new Handler().postDelayed(new Runnable() {
 
 

@@ -4,7 +4,10 @@ package com.ankurwasnik358.corona;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
@@ -74,10 +77,8 @@ public class MainActivity extends AppCompatActivity {
 
         btnDev=findViewById(R.id.button3);
         btnTest=findViewById(R.id.btnTest);
-        btnHelp=findViewById(R.id.btnContact);
         imageView =findViewById(R.id.ivUploadXrays);
         btnUpload=findViewById(R.id.button);
-        btnMap = findViewById(R.id.btnMap);
 
 
 
@@ -91,9 +92,7 @@ public class MainActivity extends AppCompatActivity {
                     intent.setAction(Intent.ACTION_GET_CONTENT);
                     startActivityForResult(Intent.createChooser(intent, "Select Picture"), 12);
                 }
-                else {
-                    Snackbar.make(btnUpload,"Bitmap already loaded.",Snackbar.LENGTH_SHORT).show();
-                }
+
             }
         });
 
@@ -115,30 +114,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //setup help button
-        btnHelp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                    Intent intent = new Intent(Intent.ACTION_DIAL);
-                    intent.setData(Uri.parse("tel:" + "1123978046"));
-                    if (intent.resolveActivity(getPackageManager()) != null) {
-                        startActivity(intent);
-                    }
-                    else{
-                        Toast.makeText(MainActivity.this, "Something went wrong ! Please try again later .", Toast.LENGTH_SHORT).show();
-                    }
-
-            }
-        });
-
         // setup Test button
         btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                     if (bitmap==null){
-                        Snackbar.make(btnUpload,"Please Upload Chest X ray." , Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(btnUpload,"Please Upload image." , Snackbar.LENGTH_SHORT).show();
                         return;
                     }
                     //initialize the model
@@ -174,27 +156,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btnMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Uri geoLocation =Uri.parse("geo:0,0?q=nearby hospital");
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setPackage("com.google.android.apps.maps");
-                intent.setData(geoLocation);
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(intent);
-                }
-                else {
-                    Snackbar.make(btnMap,"Install Google Maps",Snackbar.LENGTH_SHORT).show();
-                }
-            }
-        });
-
     }
 
     private void showresult(){
 
-         Snackbar.make( btnTest , "Getting Results... ",Snackbar.LENGTH_SHORT).show();
+        // Snackbar.make( btnTest , "Getting Results... ",Snackbar.LENGTH_SHORT).show();
         try {
             associatedAxisLabels = FileUtil.loadLabels(this, ASSOCIATED_AXIS_LABELS);
         } catch (IOException e) {
@@ -239,8 +205,32 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
-            Toast.makeText(this, op.toString() , Toast.LENGTH_SHORT).show();
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Result");
+            builder.setMessage(op);
+            builder.setCancelable(true);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            builder.show();
+
+            //Toast.makeText(this, op.toString() , Toast.LENGTH_SHORT).show();
             bitmap=null;
+            new Handler().postDelayed(new Runnable() {
+
+
+                @Override
+
+                public void run() {
+                    imageView.setImageBitmap(null);
+                }
+
+            }, 1000); // wait for 5 seconds
+
+
         }
 
     }
