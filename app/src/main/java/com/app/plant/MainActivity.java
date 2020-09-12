@@ -49,19 +49,18 @@ public class MainActivity extends AppCompatActivity {
     private  int imageSizeX;
     private  int imageSizeY;
     private static final float IMAGE_MEAN = 0.0f;
-    private static final float IMAGE_STD = 1.0f; // 1.0 -> 255.0
+    private static final float IMAGE_STD = 1.0f;
     private static final float PROBABILITY_MEAN = 0.0f;
-    private static final float PROBABILITY_STD = 255.0f; //255.0 -> 1.0
+    private static final float PROBABILITY_STD = 255.0f;
     private TensorImage inputImageBuffer;
     private  TensorBuffer outputProbabilityBuffer;
     private  TensorProcessor probabilityProcessor;
 
 
-    TextView textView ;
     public ImageView imageView;
-    Button btnTest ,btnDev , btnHelp , btnUpload , btnMap;
-    private Handler handler = new Handler();
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    Button btnTest ,btnDev  , btnUpload ;
+   // private Handler handler = new Handler();
+    static final int REQUEST_IMAGE_CAPTURE = 1; //for auth
     final String ASSOCIATED_AXIS_LABELS = "labels.txt";
     List<String> associatedAxisLabels = null;
 
@@ -172,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
            TensorLabel labels = new TensorLabel(associatedAxisLabels,
                    probabilityProcessor.process(outputProbabilityBuffer));
             // Create a map to access the result based on label
-            Map<String, Float> floatMap = labels.getMapWithFloatValue();
+          //  Map<String, Float> floatMap = labels.getMapWithFloatValue();
             final float[] pred = outputProbabilityBuffer.getFloatArray() ;
             int entryWithMaxValue=0;
             for (int i=0 ; i<15 ; i++){
@@ -183,21 +182,21 @@ public class MainActivity extends AppCompatActivity {
             }
             String op = "";
             switch (entryWithMaxValue){
-                case 0 : op="Pepper__bell___Bacterial_spot"; break;
-                case 1 : op="Pepper__bell___healthy"; break;
-                case 2 : op="Potato___Early_blight"; break;
-                case 3 : op="Potato___Late_blight"; break;
-                case 4 : op="Potato___healthy"; break;
-                case 5 : op="Tomato_Bacterial_spot"; break;
-                case 6 : op="Tomato_Early_blight"; break;
-                case 7 : op="Tomato_Late_blight"; break;
-                case 8 : op="Tomato_Leaf_Mold"; break;
-                case 9 : op="Tomato_Septoria_leaf_spot"; break;
-                case 10 : op="Tomato_Spider_mites_Two_spotted_spider_mite"; break;
-                case 11 : op="Tomato__Target_Spot"; break;
-                case 12: op="Tomato__Tomato_YellowLeaf__Curl_Virus"; break;
-                case 13: op="Tomato__Tomato_mosaic_virus"; break;
-                case 14: op="Tomato_healthy"; break;
+                case 0 : op="Pepper bell Bacterial_spot"; break;
+                case 1 : op="Pepper bell healthy"; break;
+                case 2 : op="Potato Early blight"; break;
+                case 3 : op="Potato Late blight"; break;
+                case 4 : op="Potato healthy"; break;
+                case 5 : op="Tomato_Bacterial spot"; break;
+                case 6 : op="Tomato_Early blight"; break;
+                case 7 : op="Tomato_Late blight"; break;
+                case 8 : op="Tomato leaf Mold"; break;
+                case 9 : op="Tomato Septoria_leaf spot"; break;
+                case 10 : op="Tomato Spider mites Two spotted spider mite"; break;
+                case 11 : op="Tomato Target Spot"; break;
+                case 12: op="Tomato Tomato YellowLeaf Curl Virus"; break;
+                case 13: op="Tomato Tomato mosaic virus"; break;
+                case 14: op="Tomato healthy"; break;
 
 
             }
@@ -225,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
                     imageView.setImageBitmap(null);
                 }
 
-            }, 1000); // wait for 5 seconds
+            }, 1000); // wait for 1 seconds
 
 
         }
