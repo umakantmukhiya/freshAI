@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:137990820628:android:e35d94760edc109327a801",
         "android_client_info": {
-          "package_name": "com.ankurwasnik358.corona"
+          "package_name": "com.app.plant"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "137990820628-qudevvvkdo630438af363i9k7n7p4ndj.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.ankurwasnik358.corona",
+            "package_name": "com.app.plant",
             "certificate_hash": "f0948310d26f4ca26460b470fab8b171d0558d68"
           }
         },
