@@ -1,6 +1,7 @@
 package com.app.plant;
 
 
+import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
@@ -38,6 +39,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -156,7 +158,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void showresult(){
 
-        // Snackbar.make( btnTest , "Getting Results... ",Snackbar.LENGTH_SHORT).show();
         try {
             associatedAxisLabels = FileUtil.loadLabels(this, ASSOCIATED_AXIS_LABELS);
         } catch (IOException e) {
@@ -187,9 +188,9 @@ public class MainActivity extends AppCompatActivity {
                 case 2 : op="Potato Early blight"; break;
                 case 3 : op="Potato Late blight"; break;
                 case 4 : op="Potato healthy"; break;
-                case 5 : op="Tomato_Bacterial spot"; break;
-                case 6 : op="Tomato_Early blight"; break;
-                case 7 : op="Tomato_Late blight"; break;
+                case 5 : op="Tomato Bacterial spot"; break;
+                case 6 : op="Tomato Early blight"; break;
+                case 7 : op="Tomato Late blight"; break;
                 case 8 : op="Tomato leaf Mold"; break;
                 case 9 : op="Tomato Septoria_leaf spot"; break;
                 case 10 : op="Tomato Spider mites Two spotted spider mite"; break;
@@ -197,23 +198,103 @@ public class MainActivity extends AppCompatActivity {
                 case 12: op="Tomato Tomato YellowLeaf Curl Virus"; break;
                 case 13: op="Tomato Tomato mosaic virus"; break;
                 case 14: op="Tomato healthy"; break;
-
-
             }
+            /* creating pathogen , host , */
+            Map<Integer,String> pathogenMap = new HashMap<Integer, String>();
+            Map<Integer,String> hostMap = new HashMap<Integer, String>();
+            Map<Integer,String> remedyMap = new HashMap<Integer, String>();
 
-            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Result");
-            builder.setMessage(op);
-            builder.setCancelable(true);
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-            builder.show();
 
-            //Toast.makeText(this, op.toString() , Toast.LENGTH_SHORT).show();
+
+            // hardcode values
+
+            pathogenMap.put(new Integer(0)," Xanthomonas euvesicatoria , Xanthomonas perforans") ;
+            hostMap.put(new Integer(0),"Pepper and tomato");
+            remedyMap.put(new Integer(0),"1>Use disease-free seed\n" +
+                    "\n" +
+                    "2>Seed that has been hot water treated\n" +
+                    "\n" +
+                    "3>Purchase only certified &\n" +
+                    "disease-free transplants\n" +
+                    "\n" +
+                    "4>Practice crop rotation");
+
+            pathogenMap.put(new Integer(1),"NA") ; //healthy pepper bell
+            hostMap.put(new Integer(1),"Pepper Bell");
+            remedyMap.put(new Integer(1),"Take Care and Maintain");
+
+            pathogenMap.put(new Integer(2),"Alternaria solani") ;
+            hostMap.put(new Integer(2),"Potato and tomato");
+
+            remedyMap.put(new Integer(2),"Avoid overhead irrigation and allow for sufficient aeration between plants to allow the foliage to dry as quickly as possible. Practice a 2-year crop rotation. That is, do not replant potatoes or other crops in this family for 2 years after a potato crop has been harvested.\n" +
+                    "\n" +
+                    "Read more at Gardening Know How: Potato Early Blight Treatment – Managing Potatoes With Early Blight https://www.gardeningknowhow.com/edible/vegetables/potato/potato-early-blight-treatment.htm");
+
+            pathogenMap.put(new Integer(3)," Phytophthora infestans") ;
+            hostMap.put(new Integer(3)," Potato, tomato");
+            remedyMap.put(new Integer(3),"Plant resistant cultivars when available.\n" +
+                    "Remove volunteers from the garden prior to planting and space plants far enough apart to allow for plenty of air circulation.\n" +
+                    "Water in the early morning hours, or use soaker hoses, to give plants time to dry out during the day — avoid overhead irrigation.\n" +
+                    "Destroy all tomato and potato debris after harvest (see Fall Garden Cleanup).");
+
+
+            pathogenMap.put(new Integer(4),"NA") ; //healthy potato
+            hostMap.put(new Integer(4),"Potato");
+            remedyMap.put(new Integer(4),"Take Care and Maintain");
+
+            pathogenMap.put(new Integer(5)," Xanthomonas euvesicatoria , Xanthomonas perforans") ;
+            hostMap.put(new Integer(5),"Pepper and tomato");
+            remedyMap.put(new Integer(5),"Sodium Hypochlorite");
+
+            pathogenMap.put(new Integer(6),"Alternaria solani") ;
+            hostMap.put(new Integer(6),"Potato and tomato");
+            remedyMap.put(new Integer(6),"Bacillus Subtilis Hydroperoxyl");
+
+            pathogenMap.put(new Integer(7)," Phytophthora infestans") ;
+            hostMap.put(new Integer(7)," Potato, tomato");
+            remedyMap.put(new Integer(7),"Actinovate Copper");
+
+            pathogenMap.put(new Integer(8),"Cladosporium fulvum") ;
+            hostMap.put(new Integer(8),"Tomato");
+            remedyMap.put(new Integer(8),"Applying fungicides when symptoms first appear can reduce the spread of the leaf mold fungus significantly. Several fungicides are labeled for leaf mold control on tomatoes and can provide good disease control if applied to all the foliage of the plant, especially the lower surfaces of the leaves.");
+
+            pathogenMap.put(new Integer(9)," Septoria lycopersici") ;
+            hostMap.put(new Integer(9),"Tomato");
+            remedyMap.put(new Integer(9),"Removing infected leaves. Remove infected leaves immediately, and be sure to wash your hands thoroughly before working with uninfected plants.\n" +
+                    "Consider organic fungicide options. ...\n" +
+                    "Consider chemical fungicides.");
+
+            pathogenMap.put(new Integer(10)," Tetrany chus") ;
+            hostMap.put(new Integer(10),"Tomato");
+            remedyMap.put(new Integer(10),"The best way to begin treating for two-spotted mites is to apply a pesticide specific to mites called a miticide. Ideally, you should start treating for two-spotted mites before your plants are seriously damaged. Apply the miticide for control of two-spotted mites every 7 days or so");
+
+            pathogenMap.put(new Integer(11)," Corynespora cassicola") ;
+            hostMap.put(new Integer(11),"Tomato");
+            remedyMap.put(new Integer(11),"Do not plant new crops next to older ones that have the disease.\n" +
+                    "Plant as far as possible from papaya, especially if leaves have small angular spots\n" +
+                    "Check all seedlings in the nursery, and throw away any with leaf spots.");
+
+            pathogenMap.put(new Integer(12)," Begomo virus") ;
+            hostMap.put(new Integer(12),"Tomato");
+            remedyMap.put(new Integer(12),"Treatments that are commonly used for this disease include insecticides, hybrid seeds, and growing tomatoes under greenhouse conditions.");
+
+            pathogenMap.put(new Integer(13)," Mosiac virus") ;
+            hostMap.put(new Integer(13),"Tomato");
+            remedyMap.put(new Integer(13),"There are no cures for viral diseases such as mosaic once a plant is infected. As a result, every effort should be made to prevent the disease from entering your garden. Fungicides will NOT treat this viral disease. Plant resistant varieties when available or purchase transplants from a reputable source.");
+
+            pathogenMap.put(new Integer(14)," NA") ;
+            hostMap.put(new Integer(14),"Tomato");
+            remedyMap.put(new Integer(14),"Take Care and Maintain");
+
+
+            Intent rintent = new Intent(MainActivity.this , Result_activity.class);
+            rintent.putExtra("pathogen",pathogenMap.get(entryWithMaxValue)) ;
+            rintent.putExtra("host" , hostMap.get(entryWithMaxValue));
+            rintent.putExtra("headline",op);
+            rintent.putExtra("remedy",remedyMap.get(entryWithMaxValue));
+
+            startActivity(rintent);
+
             bitmap=null;
             new Handler().postDelayed(new Runnable() {
 
