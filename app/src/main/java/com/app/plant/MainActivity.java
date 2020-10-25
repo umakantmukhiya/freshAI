@@ -193,10 +193,10 @@ public class MainActivity extends AppCompatActivity {
                 case 7 : op="Tomato Late blight"; break;
                 case 8 : op="Tomato leaf Mold"; break;
                 case 9 : op="Tomato Septoria_leaf spot"; break;
-                case 10 : op="Tomato Spider mites Two spotted spider mite"; break;
+                case 10 : op="Tomato Spider mites "; break;
                 case 11 : op="Tomato Target Spot"; break;
-                case 12: op="Tomato Tomato YellowLeaf Curl Virus"; break;
-                case 13: op="Tomato Tomato mosaic virus"; break;
+                case 12: op="Tomato YellowLeaf Curl Virus"; break;
+                case 13: op="Tomato mosaic virus"; break;
                 case 14: op="Tomato healthy"; break;
             }
             /* creating pathogen , host , */
