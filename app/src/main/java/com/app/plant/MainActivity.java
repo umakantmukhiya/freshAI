@@ -154,14 +154,14 @@ btnTestFruit.setOnClickListener(new View.OnClickListener() {
         btnDev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Uri uri = Uri.parse("https://www.instagram.com/wasnik.ankur.358/?hl=en");
+                Uri uri = Uri.parse("https://www.instagram.com/umakantmukhiya/");
                 Intent intent = new Intent(Intent.ACTION_VIEW , uri);
                 intent.setPackage("com.instagram.android");
                 try {
                     startActivity(intent);
                 }
                 catch (ActivityNotFoundException e){
-                    startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.instagram.com/wasnik.ankur.358/?hl=en")));
+                    startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.instagram.com/umakantmukhiya/")));
                 }
             }
         });
