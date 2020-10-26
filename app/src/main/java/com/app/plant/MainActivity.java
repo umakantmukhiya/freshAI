@@ -1,6 +1,4 @@
 package com.app.plant;
-
-
 import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -60,10 +59,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     public ImageView imageView;
-    Button btnTest ,btnDev  , btnUpload ;
+    Button btnTest ,btnDev  , btnUpload,btnFruit , btnTestFruit;
    // private Handler handler = new Handler();
     static final int REQUEST_IMAGE_CAPTURE = 1; //for auth
     final String ASSOCIATED_AXIS_LABELS = "labels.txt";
+    final String ASSOCIATED_AXIS_LABELS_FRUITS = "label_apple.txt";
+    final String APPLE_MODEL = "apple.tflite";
     List<String> associatedAxisLabels = null;
 
 
@@ -72,11 +73,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        btnFruit = findViewById(R.id.buttonfruit);
         btnDev=findViewById(R.id.button3);
         btnTest=findViewById(R.id.btnTest);
         imageView =findViewById(R.id.ivUploadXrays);
         btnUpload=findViewById(R.id.button);
+        btnTestFruit =findViewById(R.id.btnTestApple);
 
 
 
@@ -94,7 +96,60 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btnFruit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (bitmap==null) {
+                    Intent intent = new Intent();
+                    intent.setType("image/*");
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), 8);
+                }
 
+
+
+            }
+        });
+
+btnTestFruit.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        if (bitmap==null){
+            Snackbar.make(btnUpload,"Please Upload image." , Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+        //initialize the model
+        try {
+            tflite = new Interpreter(loadModelFile(MainActivity.this,"Apple"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //ready inputs to model
+        int imageTensorIndex = 0;
+        int[] imageShape = tflite.getInputTensor(imageTensorIndex).shape(); // {1, height, width, 3}
+        imageSizeY = imageShape[1];
+        imageSizeX = imageShape[2];
+        DataType imageDataType = tflite.getInputTensor(imageTensorIndex).dataType();
+
+        //ready output to model
+        int probabilityTensorIndex = 0;
+        int[] probabilityShape =tflite.getOutputTensor(probabilityTensorIndex).shape(); // {1, NUM_CLASSES}
+        DataType probabilityDataType = tflite.getOutputTensor(probabilityTensorIndex).dataType();
+
+        inputImageBuffer = new TensorImage(imageDataType);
+        outputProbabilityBuffer = TensorBuffer.createFixedSize(probabilityShape, probabilityDataType);
+        probabilityProcessor = new TensorProcessor.Builder().add(getPostprocessNormalizeOp()).build();
+        //load the image
+        inputImageBuffer = loadImage(bitmap);
+        //run the model and store pred in outputProbabilityBuffer
+        tflite.run(inputImageBuffer.getBuffer(), outputProbabilityBuffer.getBuffer().rewind());
+
+        tflite.close();
+        tflite= null ;
+        appleresult();
+    }
+});
         //setup dev btn
         btnDev.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,7 +157,6 @@ public class MainActivity extends AppCompatActivity {
                 Uri uri = Uri.parse("https://www.instagram.com/wasnik.ankur.358/?hl=en");
                 Intent intent = new Intent(Intent.ACTION_VIEW , uri);
                 intent.setPackage("com.instagram.android");
-
                 try {
                     startActivity(intent);
                 }
@@ -112,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // setup Test button
+        // setup check / Test button
         btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -123,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     //initialize the model
                     try {
-                        tflite = new Interpreter(loadModelFile(MainActivity.this));
+                        tflite = new Interpreter(loadModelFile(MainActivity.this,"Not_Apple"));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -154,6 +208,68 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+
+    private void appleresult() {
+        try {
+            associatedAxisLabels = FileUtil.loadLabels(this, ASSOCIATED_AXIS_LABELS_FRUITS);
+        } catch (IOException e) {
+            Log.e("tfliteSupport", "Error reading label file", e);
+        }
+
+        TensorProcessor probabilityProcessor =
+                new TensorProcessor.Builder().add(new NormalizeOp(0, 255)).build();
+
+        if (null != associatedAxisLabels) {
+            // Map of labels and their corresponding probability
+            TensorLabel labels = new TensorLabel(associatedAxisLabels,
+                    probabilityProcessor.process(outputProbabilityBuffer));
+            // Create a map to access the result based on label
+            //  Map<String, Float> floatMap = labels.getMapWithFloatValue();
+            final float[] pred = outputProbabilityBuffer.getFloatArray();
+            int entryWithMaxValue =-1;
+            for (int i = 0; i < 6; i++) {
+                if (pred[i] == 1) {
+                    entryWithMaxValue = i;
+                    break;
+                }
+            }
+            String op = "";
+            switch (entryWithMaxValue) {
+                case 0:
+                    op = "fresh Apples";
+                    break;
+                case 1:
+                    op = "fresh Banana";
+                    break;
+                case 2:
+                    op = "fresh Oranges";
+                    break;
+                case 3:
+                    op = "rotten Apples";
+                    break;
+                case 4:
+                    op = "rotten Banana";
+                    break;
+                case 5:
+                    op = "rotten Oranges";
+                    break;
+
+            }
+            Toast.makeText(this, op, Toast.LENGTH_SHORT).show();
+            bitmap=null;
+            new Handler().postDelayed(new Runnable() {
+
+
+                @Override
+
+                public void run() {
+                    imageView.setImageBitmap(null);
+                }
+
+            }, 1000); // wait for 1 seconds
+        }
     }
 
     private void showresult(){
@@ -326,13 +442,30 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
+        if(requestCode==8 && resultCode==RESULT_OK && data!=null) {
+            imageuri = data.getData();
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageuri);
+                imageView.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         if (requestCode==REQUEST_IMAGE_CAPTURE && resultCode==RESULT_OK && data!=null){
             Bitmap thumbnail = data.getParcelableExtra("data");
             bitmap = thumbnail;
         }
     }
-    private MappedByteBuffer loadModelFile(Activity activity) throws IOException {
-        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd("model.tflite");
+    private MappedByteBuffer loadModelFile(Activity activity , String type) throws IOException {
+        AssetFileDescriptor fileDescriptor = null;
+        if(type == "Apple"){
+             fileDescriptor = activity.getAssets().openFd(APPLE_MODEL);
+        }
+        else {
+             fileDescriptor = activity.getAssets().openFd("model.tflite");
+        }
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
         FileChannel fileChannel = inputStream.getChannel();
         long startOffset = fileDescriptor.getStartOffset();
